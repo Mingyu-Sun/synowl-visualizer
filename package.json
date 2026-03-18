@@ -3,7 +3,7 @@
   "productName": "synowl-visualizer",
   "version": "1.0.0",
   "description": "A real-time music visualizer",
-  "type": "module",
+  "type": "commonjs",
   "main": "src/index.js",
   "private": true,
   "scripts": {

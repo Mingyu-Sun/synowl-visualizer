@@ -1,8 +1,7 @@
-import {app, BrowserWindow, desktopCapturer, session} from 'electron';
-import electronSquirrelStartup from 'electron-squirrel-startup';
-import path from 'node:path';
+const {app, BrowserWindow, desktopCapturer, session} = require('electron');
+const path = require('node:path');
 
-if (electronSquirrelStartup) {
+if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
@@ -11,7 +10,7 @@ const createWindow = () => {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(import.meta.dirname, 'preload.js'),
+            preload: path.join(__dirname, 'preload.js'),
         },
     });
 
@@ -21,7 +20,7 @@ const createWindow = () => {
         });
     });
 
-    mainWindow.loadFile(path.join(import.meta.dirname, 'index.html'));
+    mainWindow.loadFile(path.join(__dirname, 'index.html'));
     mainWindow.webContents.openDevTools();
 };
 
