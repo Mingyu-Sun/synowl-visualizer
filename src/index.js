@@ -1,14 +1,12 @@
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, desktopCapturer, session} from 'electron';
 import electronSquirrelStartup from 'electron-squirrel-startup';
 import path from 'node:path';
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (electronSquirrelStartup) {
     app.quit();
 }
 
 const createWindow = () => {
-    // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
@@ -17,16 +15,16 @@ const createWindow = () => {
         },
     });
 
-    // and load the index.html of the app.
-    mainWindow.loadFile(path.join(import.meta.dirname, 'index.html'));
+    session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
+        desktopCapturer.getSources({types: ['screen']}).then((sources) => {
+            callback({video: sources[0], audio: 'loopback'});
+        });
+    });
 
-    // Open the DevTools.
+    mainWindow.loadFile(path.join(import.meta.dirname, 'index.html'));
     mainWindow.webContents.openDevTools();
 };
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
     createWindow();
 
