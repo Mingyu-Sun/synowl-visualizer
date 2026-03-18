@@ -3,6 +3,7 @@
   "productName": "synowl-visualizer",
   "version": "1.0.0",
   "description": "A real-time music visualizer",
+  "type": "module",
   "main": "src/index.js",
   "private": true,
   "scripts": {
@@ -10,7 +11,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [],
   "author": {
@@ -22,7 +24,7 @@
     "electron-squirrel-startup": "^1.0.1"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.11.1",
+    "@electron-forge/cli": "^7.6.1",
     "@electron-forge/maker-deb": "^7.11.1",
     "@electron-forge/maker-rpm": "^7.11.1",
     "@electron-forge/maker-squirrel": "^7.11.1",
@@ -30,6 +32,10 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
     "@electron-forge/plugin-fuses": "^7.11.1",
     "@electron/fuses": "^1.8.0",
-    "electron": "41.0.2"
+    "@eslint/css": "^1.0.0",
+    "@eslint/js": "^10.0.1",
+    "electron": "41.0.2",
+    "eslint": "^10.0.3",
+    "globals": "^17.4.0"
   }
 }
