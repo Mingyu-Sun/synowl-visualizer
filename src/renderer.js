@@ -1,48 +1,37 @@
-async function startCapture() {
-    try {
-        const stream = await navigator.mediaDevices.getDisplayMedia({
-            audio: true
-        });
+import {extractFeatures} from './extractor.js';
+import {visualize} from "./visualizer.js";
+import {initialState, smoothFeatures} from "./states.js";
 
-        const audioContext = new AudioContext();
+const init = async () => {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
 
-        const source = audioContext.createMediaStreamSource(stream);
-        const analyzer = audioContext.createAnalyser();
-        source.connect(analyzer);
+    const stream = await navigator.mediaDevices.getDisplayMedia({audio: true, video: true});
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
 
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const dataArray = new Uint8Array(analyzer.frequencyBinCount);
+    // Default parameters
+    analyser.fftSize = 2048;
+    analyser.minDecibels = -85;
+    analyser.maxDecibels = -25;
+    analyser.smoothingTimeConstant = 0.8;
 
+    source.connect(analyser);
 
-        function draw() {
-            requestAnimationFrame(draw);
-            analyzer.getByteFrequencyData(dataArray);
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+    const state = {...initialState};
 
-            // Clear the canvas
-            ctx.fillStyle = 'rgb(0, 0, 0)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function loop() {
+        analyser.getByteFrequencyData(frequencyData);
 
-            // Draw bars
-            const barWidth = (canvas.width / dataArray.length) * 2;
-            let x = 0;
-
-            for (let i = 0; i < dataArray.length; i++) {
-                const barHeight = (dataArray[i] / 255) * canvas.height;
-
-                const hue = (i / dataArray.length) * 360;
-                ctx.fillStyle = `hsla(${hue}, 80%, 50%, 0.8)`;
-                ctx.fillRect(x, (canvas.height - barHeight) / 2, barWidth - 1, barHeight);
-
-                x += barWidth;
-            }
-        }
-
-        draw();
-
-    } catch (err) {
-        console.error("ERROR:", err);
+        const features = extractFeatures(frequencyData, audioContext.sampleRate, analyser.fftSize, state.lastEnergy);
+        smoothFeatures(state, features);
+        visualize(frequencyData, ctx, state, canvas.width, canvas.height);
+        requestAnimationFrame(loop);
     }
+
+    loop();
 }
 
-document.getElementById('startBtn').addEventListener('click', startCapture);
+document.getElementById('startBtn').addEventListener('click', init);
