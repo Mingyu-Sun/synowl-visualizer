@@ -1,28 +1,41 @@
 export const visualize = (dataArray, ctx, s, w, h) => {
-    ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
-    ctx.fillRect(0, 0, w, h);
+    ctx.clearRect(0, 0, w, h);
 
-    const barWidth = (w / dataArray.length) * 2.5;
-    let x = 0;
+    const centerX = w / 2;
+    const centerY = h / 2;
 
-    // Draw Bars
-    for (let i = 0; i < dataArray.length; i++) {
+    // Base radius
+    const innerRadius = (h * 0.15) + (s.energy * 100);
+
+    // Draw radial bars
+    const numBars = dataArray.length / 2; // only use the audible range
+    const angleStep = (Math.PI * 2) / numBars;
+
+    for (let i = 0; i < numBars; i++) {
         const norm = dataArray[i] / 255;
-        const barHeight = norm * (h * 0.4);
+        const barHeight = norm * (h * 0.3) * (1 + s.onset);
 
-        const hue = (s.hue + (i / dataArray.length) * 200) % 360;
-        ctx.fillStyle = `hsla(${hue}, 80%, 60%, ${0.2 + norm * 0.5})`;
-        ctx.fillRect(x, (h - barHeight) / 2, barWidth - 1, barHeight);
+        const angle = i * angleStep;
 
-        x += barWidth;
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle);
+
+        const hue = (s.hue + (i / numBars) * 100) % 360;
+        ctx.fillStyle = `hsla(${hue}, 80%, 60%, ${0.3 + norm * 0.7})`;
+
+        const barWidth = (innerRadius * angleStep) * 0.8;
+        ctx.fillRect(barWidth / 2, innerRadius - barHeight / 2, barWidth, barHeight);
+
+        ctx.restore();
     }
 
-    // Draw Center Pulse
-    ctx.beginPath();
-    const pulseScale = Math.pow(s.energy, 1.2);
-    const radius = (h * 0.15) + (pulseScale * 250) + (s.bass * 50);
+    drawCenterPulse(ctx, s, centerX, centerY, innerRadius);
+}
 
-    ctx.arc(w / 2, h / 2, radius, 0, Math.PI * 2);
+const drawCenterPulse = (ctx, s, x, y, r) => {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.strokeStyle = `hsla(${s.hue}, 100%, 70%, ${0.4 + s.onset * 0.6})`;
     ctx.lineWidth = 2 + s.onset * 15;
     ctx.stroke();

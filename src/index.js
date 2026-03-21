@@ -1,14 +1,20 @@
 const {app, BrowserWindow, desktopCapturer, session} = require('electron');
 const path = require('node:path');
 
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+
 if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
 const createWindow = () => {
     const mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 450,
+        height: 450,
+        alwaysOnTop: true,
+        visibleOnAllWorkspaces: true,
+        frame: false,
+        transparent: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
