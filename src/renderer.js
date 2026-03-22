@@ -57,7 +57,8 @@ const toggleCapture = async (btn) => {
 
             frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
-            btn.innerText = 'Stop Capture';
+            btn.classList.toggle('startIcon');
+            btn.classList.toggle('pauseIcon');
             isCapturing = true;
 
             stream.getTracks()[0].onended = () => {
@@ -72,13 +73,25 @@ const toggleCapture = async (btn) => {
         if (stream) stream.getTracks().forEach(track => track.stop());
         if (audioContext) await audioContext.close();
 
-        btn.innerText = 'Start Capture';
+        btn.classList.toggle('startIcon');
+        btn.classList.toggle('pauseIcon');
         isCapturing = false;
 
         analyser = null;
         audioContext = null;
     }
 }
+
+window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    window.electronAPI.showContextMenu();
+});
+
+window.electronAPI.onContextMenuCommand((command) => {
+    if (command === 'setting') {
+        alert('Setting was clicked!');
+    }
+});
 
 const toggleBtn = document.getElementById('toggleBtn');
 toggleBtn.addEventListener('click', () => {

@@ -1,4 +1,4 @@
-const {app, BrowserWindow, desktopCapturer, session} = require('electron');
+const {app, ipcMain, BrowserWindow, Menu, Tray, desktopCapturer, session} = require('electron');
 const path = require('node:path');
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
@@ -7,20 +7,41 @@ if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
+let mainWindow;
+let tray;
+
 const createWindow = () => {
-    const mainWindow = new BrowserWindow({
-        width: 350,
-        height: 350,
+    mainWindow = new BrowserWindow({
+        width: 300,
+        height: 300,
         alwaysOnTop: true,
-        visibleOnAllWorkspaces: true,
         frame: false,
         transparent: true,
+        skipTaskbar: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
             contextIsolation: true,
             sandbox: false
         },
+    });
+
+    ipcMain.on('show-context-menu', (event) => {
+        const template = [
+            {
+                label: 'Setting',
+                click:
+                    () => {
+                        event.sender.send('context-menu-command', 'setting');
+                    }
+            },
+            {label: 'Quit', role: 'quit'},
+            {type: 'separator'},
+            {label: 'Inspect', role: 'toggleDevTools'}
+        ];
+        const menu = Menu.buildFromTemplate(template);
+
+        menu.popup({window: BrowserWindow.fromWebContents(event.sender)});
     });
 
     session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
@@ -30,19 +51,23 @@ const createWindow = () => {
     });
 
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
-    mainWindow.webContents.openDevTools();
 };
 
-app.whenReady().then(() => {
-    createWindow();
+const createTray = () => {
+    const icon = path.join(__dirname, 'assets/icon.png');
+    tray = new Tray(icon);
+    const contextMenu = Menu.buildFromTemplate([
+        {role: 'quit'}
+    ]);
+    tray.setContextMenu(contextMenu);
+}
 
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow();
-        }
-    });
+app.whenReady().then(() => {
+    if (process.platform === 'darwin') {
+        app.dock.hide();
+    }
+    createWindow();
+    createTray();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -54,5 +79,3 @@ app.on('window-all-closed', () => {
     }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
