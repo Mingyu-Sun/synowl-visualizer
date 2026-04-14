@@ -6,7 +6,9 @@ export const initialState = {
     onset: 0,
     hue: 200,
     lastEnergy: 0,
-    phase: 0
+    phase: 0,
+    warmth: 0, // 0 (Cold) to 1 (Warm)
+    beatDensity: 0,
 };
 
 export const smoothFeatures = (state, raw, isCapturing) => {
@@ -16,8 +18,23 @@ export const smoothFeatures = (state, raw, isCapturing) => {
         // --- ACTIVE MODE ---
         state.energy += (raw.energy - state.energy) * 0.12;
         state.bass += (raw.bass - state.bass) * 0.2;
+        state.flatness += (raw.flatness - state.flatness) * 0.1;
+        state.centroid += (raw.centroid - state.centroid) * 0.1;
 
-        const targetHue = raw.centroid > 0 ? (Math.log2(raw.centroid / 100) * 60) % 360 : state.hue;
+        if (raw.isOnset) {
+            state.beatDensity = Math.min(state.beatDensity + 0.8, 1.0);
+        } else {
+            state.beatDensity *= 0.98;
+        }
+
+        const energyScore = Math.min(raw.energy / 0.15, 1);
+        const bassScore = Math.min(raw.bass / 0.1, 1);
+        const rhythmScore = state.beatDensity;
+
+        const targetWarmth = (energyScore * 0.3 + rhythmScore * 0.5 + bassScore * 0.2);
+        state.warmth += (targetWarmth - state.warmth) * 0.05;
+
+        const targetHue = 200 - (200 * state.warmth);
         state.hue += (targetHue - state.hue) * 0.05;
 
         if (raw.isOnset) state.onset = 1.0;
@@ -31,6 +48,8 @@ export const smoothFeatures = (state, raw, isCapturing) => {
         state.energy += (breathing - state.energy) * 0.02;
         state.bass += (0.02 - state.bass) * 0.02;
         state.onset *= 0.9;
+        state.beatDensity *= 0.95;
         state.hue = (state.hue + 0.1) % 360;
+        state.warmth *= 0.95;
     }
 };

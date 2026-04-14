@@ -23,8 +23,7 @@ export const extractFeatures = (dataArray, sampleRate, fftSize, lastEnergy) => {
 
     const currentEnergy = count > 0 ? totalNorm / count : 0;
 
-    // Sensitivity = 0.1
-    const isOnset = (currentEnergy - lastEnergy) > 0.1;
+    const isOnset = (currentEnergy - lastEnergy) > 0.03;
 
     return {
         energy: currentEnergy,

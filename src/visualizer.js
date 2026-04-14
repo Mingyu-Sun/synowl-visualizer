@@ -37,6 +37,6 @@ const drawCenterPulse = (ctx, s, x, y, r) => {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.strokeStyle = `hsla(${s.hue}, 100%, 70%, ${0.4 + s.onset * 0.6})`;
-    ctx.lineWidth = 3 + s.onset * 15;
+    ctx.lineWidth = 3 + s.onset * 10;
     ctx.stroke();
 }
