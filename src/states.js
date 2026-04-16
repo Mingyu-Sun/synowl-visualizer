@@ -11,13 +11,20 @@ export const initialState = {
     beatDensity: 0,
 };
 
-export const smoothFeatures = (state, raw, isCapturing) => {
+export const defaultConfig = {
+    energySmoothing: 0.12,
+    bassSmoothing: 0.2,
+    colorScheme: 'dynamic',
+    baseHue: 200,
+};
+
+export const smoothFeatures = (state, raw, isCapturing, config = defaultConfig) => {
     state.phase += 0.01; // Constant time-based counter
 
     if (isCapturing && raw) {
         // --- ACTIVE MODE ---
-        state.energy += (raw.energy - state.energy) * 0.12;
-        state.bass += (raw.bass - state.bass) * 0.2;
+        state.energy += (raw.energy - state.energy) * config.energySmoothing;
+        state.bass += (raw.bass - state.bass) * config.bassSmoothing;
         state.flatness += (raw.flatness - state.flatness) * 0.1;
         state.centroid += (raw.centroid - state.centroid) * 0.1;
 
@@ -34,8 +41,19 @@ export const smoothFeatures = (state, raw, isCapturing) => {
         const targetWarmth = (energyScore * 0.3 + rhythmScore * 0.5 + bassScore * 0.2);
         state.warmth += (targetWarmth - state.warmth) * 0.05;
 
-        const targetHue = 200 - (200 * state.warmth);
-        state.hue += (targetHue - state.hue) * 0.05;
+        // Color scheme
+        if (config.colorScheme === 'dynamic') {
+            const targetHue = 200 - (200 * state.warmth);
+            state.hue += (targetHue - state.hue) * 0.05;
+        } else if (config.colorScheme === 'cool') {
+            const targetHue = 180 + (80 * (1 - state.warmth)); // 180-260
+            state.hue += (targetHue - state.hue) * 0.05;
+        } else if (config.colorScheme === 'warm') {
+            const targetHue = 60 * state.warmth; // 0-60
+            state.hue += (targetHue - state.hue) * 0.05;
+        } else if (config.colorScheme === 'monochrome') {
+            state.hue += (config.baseHue - state.hue) * 0.1;
+        }
 
         if (raw.isOnset) state.onset = 1.0;
         else state.onset *= 0.92;

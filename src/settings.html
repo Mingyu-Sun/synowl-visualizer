@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 13px;
+            background: #1e1e24;
+            color: #ccc;
+            padding: 20px;
+            user-select: none;
+        }
+
+        h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 18px;
+        }
+
+        .setting-group {
+            margin-bottom: 14px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #aaa;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-row input[type="range"] {
+            flex: 1;
+            accent-color: hsl(200, 80%, 60%);
+        }
+
+        .setting-row .val {
+            min-width: 40px;
+            text-align: right;
+            font-size: 12px;
+            color: #888;
+            font-variant-numeric: tabular-nums;
+        }
+
+        select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            color: #ddd;
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+
+        select:focus {
+            outline: 1px solid hsl(200, 80%, 60%);
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 16px 0;
+        }
+
+        button#reset-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        button#reset-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<h1>Settings</h1>
+
+<div class="setting-group">
+    <label for="set-fftSize">FFT Size</label>
+    <select id="set-fftSize">
+        <option value="512">512</option>
+        <option value="1024">1024</option>
+        <option value="2048">2048</option>
+        <option value="4096">4096</option>
+        <option value="8192">8192</option>
+    </select>
+</div>
+
+<div class="setting-group">
+    <label for="set-colorScheme">Color Scheme</label>
+    <select id="set-colorScheme">
+        <option value="dynamic">Dynamic</option>
+        <option value="cool">Cool</option>
+        <option value="warm">Warm</option>
+        <option value="monochrome">Monochrome</option>
+    </select>
+</div>
+
+<hr/>
+
+<div class="setting-group">
+    <label for="set-minDecibels">Min Decibels</label>
+    <div class="setting-row">
+        <input id="set-minDecibels" max="-30" min="-100" step="1" type="range"/>
+        <span class="val" id="val-minDecibels"></span>
+    </div>
+</div>
+
+<div class="setting-group">
+    <label for="set-maxDecibels">Max Decibels</label>
+    <div class="setting-row">
+        <input id="set-maxDecibels" max="0" min="-60" step="1" type="range"/>
+        <span class="val" id="val-maxDecibels"></span>
+    </div>
+</div>
+
+<div class="setting-group">
+    <label for="set-smoothingTimeConstant">Analyser Smoothing</label>
+    <div class="setting-row">
+        <input id="set-smoothingTimeConstant" max="0.99" min="0" step="0.01" type="range"/>
+        <span class="val" id="val-smoothingTimeConstant"></span>
+    </div>
+</div>
+
+<hr/>
+
+<div class="setting-group">
+    <label for="set-energySmoothing">Energy Response</label>
+    <div class="setting-row">
+        <input id="set-energySmoothing" max="0.5" min="0.01" step="0.01" type="range"/>
+        <span class="val" id="val-energySmoothing"></span>
+    </div>
+</div>
+
+<div class="setting-group">
+    <label for="set-bassSmoothing">Bass Response</label>
+    <div class="setting-row">
+        <input id="set-bassSmoothing" max="0.5" min="0.01" step="0.01" type="range"/>
+        <span class="val" id="val-bassSmoothing"></span>
+    </div>
+</div>
+
+<hr/>
+
+<div class="setting-group">
+    <label for="set-windowSize">Window Size</label>
+    <div class="setting-row">
+        <input id="set-windowSize" max="800" min="200" step="10" type="range"/>
+        <span class="val" id="val-windowSize"></span>
+    </div>
+</div>
+
+<div class="setting-group">
+    <label for="set-windowOpacity">Opacity</label>
+    <div class="setting-row">
+        <input id="set-windowOpacity" max="1.0" min="0.2" step="0.05" type="range"/>
+        <span class="val" id="val-windowOpacity"></span>
+    </div>
+</div>
+
+<button id="reset-btn">Reset to Defaults</button>
+
+<script src="settings-renderer.js"></script>
+</body>
+</html>
