@@ -9,6 +9,7 @@ const sliders = [
 ];
 
 const selects = [
+    {id: 'set-visualizationMode', key: 'visualizationMode', isInt: false},
     {id: 'set-fftSize', key: 'fftSize', isInt: true},
     {id: 'set-colorScheme', key: 'colorScheme', isInt: false},
 ];
@@ -30,7 +31,6 @@ const init = async () => {
     const settings = await window.settingsAPI.getSettings();
     populate(settings);
 
-    // Bind sliders
     for (const s of sliders) {
         const el = document.getElementById(s.id);
         const valEl = document.getElementById(s.valId);
@@ -41,7 +41,6 @@ const init = async () => {
         });
     }
 
-    // Bind selects
     for (const s of selects) {
         const el = document.getElementById(s.id);
         el.addEventListener('change', async () => {
@@ -50,7 +49,6 @@ const init = async () => {
         });
     }
 
-    // Reset button
     document.getElementById('reset-btn').addEventListener('click', async () => {
         const updated = await window.settingsAPI.resetSettings();
         populate(updated);

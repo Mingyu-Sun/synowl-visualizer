@@ -7,6 +7,7 @@ let config = {...defaultConfig};
 
 let fftSize = 2048;
 let frequencyData = new Uint8Array(fftSize / 2);
+let timeDomainData = new Uint8Array(fftSize / 2);
 
 let isCapturing = false;
 let stream = null;
@@ -17,21 +18,22 @@ let source = null;
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-// --- Settings integration ---
+// --- Settings ---
 const applySettings = (settings) => {
     config = {
         energySmoothing: settings.energySmoothing,
         bassSmoothing: settings.bassSmoothing,
         colorScheme: settings.colorScheme,
         baseHue: settings.baseHue,
+        visualizationMode: settings.visualizationMode,
     };
 
-    // Apply audio analyser settings
     if (analyser) {
         if (settings.fftSize !== fftSize) {
             fftSize = settings.fftSize;
             analyser.fftSize = fftSize;
             frequencyData = new Uint8Array(analyser.frequencyBinCount);
+            timeDomainData = new Uint8Array(analyser.frequencyBinCount);
         }
         analyser.minDecibels = settings.minDecibels;
         analyser.maxDecibels = settings.maxDecibels;
@@ -39,22 +41,20 @@ const applySettings = (settings) => {
     } else {
         fftSize = settings.fftSize;
         frequencyData = new Uint8Array(fftSize / 2);
+        timeDomainData = new Uint8Array(fftSize / 2);
     }
 
-    // Update canvas size
     if (canvas.width !== settings.windowSize) {
         canvas.width = settings.windowSize;
         canvas.height = settings.windowSize;
     }
 };
 
-// Load initial settings, then start the loop
 window.electronAPI.getSettings().then((settings) => {
     applySettings(settings);
     loop();
 });
 
-// React to live settings changes from the settings window
 window.electronAPI.onSettingsChanged((settings) => {
     applySettings(settings);
 });
@@ -62,16 +62,21 @@ window.electronAPI.onSettingsChanged((settings) => {
 const loop = () => {
     if (isCapturing) {
         analyser.getByteFrequencyData(frequencyData);
+        analyser.getByteTimeDomainData(timeDomainData);
     } else {
+        // Decay
         for (let i = 0; i < frequencyData.length; i++) {
             frequencyData[i] *= 0.9;
+        }
+        for (let i = 0; i < timeDomainData.length; i++) {
+            timeDomainData[i] += (128 - timeDomainData[i]) * 0.1;
         }
     }
 
     const features = isCapturing ? extractFeatures(frequencyData, audioContext.sampleRate, fftSize, state.lastEnergy) : null;
 
     smoothFeatures(state, features, isCapturing, config);
-    visualize(frequencyData, ctx, state, canvas.width, canvas.height, config);
+    visualize(frequencyData, ctx, state, canvas.width, canvas.height, config, timeDomainData);
     requestAnimationFrame(loop);
 }
 
@@ -92,6 +97,7 @@ const toggleCapture = async (btn) => {
             source.connect(analyser);
 
             frequencyData = new Uint8Array(analyser.frequencyBinCount);
+            timeDomainData = new Uint8Array(analyser.frequencyBinCount);
 
             btn.classList.toggle('startIcon');
             btn.classList.toggle('pauseIcon');

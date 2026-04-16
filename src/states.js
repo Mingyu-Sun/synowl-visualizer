@@ -16,6 +16,7 @@ export const defaultConfig = {
     bassSmoothing: 0.2,
     colorScheme: 'dynamic',
     baseHue: 200,
+    visualizationMode: 'radial',
 };
 
 export const smoothFeatures = (state, raw, isCapturing, config = defaultConfig) => {

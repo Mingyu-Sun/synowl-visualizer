@@ -38,8 +38,8 @@
 }
 
 .startIcon {
-    background: url('assets/start.png') no-repeat center;
+    background: url('../assets/start.png') no-repeat center;
 }
 .pauseIcon {
-    background: url('assets/pause.png') no-repeat center;
+    background: url('../assets/pause.png') no-repeat center;
 }
