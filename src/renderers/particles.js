@@ -7,7 +7,7 @@ export const renderParticles = (dataArray, ctx, s, w, h, config) => {
     const isMonochrome = config.colorScheme === 'monochrome';
 
     // --- Spawn new particles ---
-    const spawnCount = Math.floor(s.energy * 8 + s.onset * 15);
+    const spawnCount = Math.floor(s.energy * 8 + s.onset * 10);
     for (let i = 0; i < spawnCount && pool.length < MAX_PARTICLES; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 1 + Math.random() * 3 + s.onset * 4;
@@ -21,7 +21,7 @@ export const renderParticles = (dataArray, ctx, s, w, h, config) => {
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
             life: 1.0,
-            decay: 0.008 + Math.random() * 0.015,
+            decay: 0.008 + Math.random() * 0.005,
             size: 2 + Math.random() * 3 + s.onset * 2,
             hue,
             saturation: isMonochrome ? 20 : 70 + Math.random() * 20,

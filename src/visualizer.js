@@ -1,8 +1,10 @@
 import {renderRadial} from './renderers/radial.js';
+import {renderSpectrum} from './renderers/spectrum.js';
 import {renderParticles} from './renderers/particles.js';
 
 const renderers = {
     radial: renderRadial,
+    spectrum: renderSpectrum,
     particles: renderParticles,
 };
 

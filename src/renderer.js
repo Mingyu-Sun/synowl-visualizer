@@ -68,9 +68,7 @@ const loop = () => {
         for (let i = 0; i < frequencyData.length; i++) {
             frequencyData[i] *= 0.9;
         }
-        for (let i = 0; i < timeDomainData.length; i++) {
-            timeDomainData[i] += (128 - timeDomainData[i]) * 0.1;
-        }
+        timeDomainData.fill(128);
     }
 
     const features = isCapturing ? extractFeatures(frequencyData, audioContext.sampleRate, fftSize, state.lastEnergy) : null;
