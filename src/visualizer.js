@@ -1,9 +1,11 @@
 import {renderRadial} from './renderers/radial.js';
+import {renderWaveform} from './renderers/waveform.js';
 import {renderSpectrum} from './renderers/spectrum.js';
 import {renderParticles} from './renderers/particles.js';
 
 const renderers = {
     radial: renderRadial,
+    waveform: renderWaveform,
     spectrum: renderSpectrum,
     particles: renderParticles,
 };
