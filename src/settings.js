@@ -9,13 +9,15 @@ const defaults = {
     minDecibels: -85,
     maxDecibels: -25,
     smoothingTimeConstant: 0.8,
-    colorScheme: 'dynamic',       // 'dynamic' | 'cool' | 'warm' | 'monochrome'
+    colorScheme: 'dynamic',
     baseHue: 200,
-    visualizationMode: 'radial',  // 'radial' (future: 'waveform' | 'spectrum' | 'particles')
+    visualizationMode: 'radial',
     windowOpacity: 1.0,
     windowSize: 300,
     energySmoothing: 0.12,
     bassSmoothing: 0.2,
+    windowX: undefined,
+    windowY: undefined,
 };
 
 const load = () => {
@@ -42,9 +44,16 @@ const updateSettings = (partial) => {
 };
 
 const resetSettings = () => {
-    current = {...defaults};
+    const {windowX, windowY} = current;
+    current = {...defaults, windowX, windowY};
     save(current);
     return {...current};
 };
 
-module.exports = {getSettings, updateSettings, resetSettings, defaults};
+const setWindowPosition = (x, y) => {
+    current.windowX = x;
+    current.windowY = y;
+    save(current);
+};
+
+module.exports = {getSettings, updateSettings, resetSettings, setWindowPosition, defaults};

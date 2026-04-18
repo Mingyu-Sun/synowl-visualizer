@@ -35,8 +35,8 @@ const init = async () => {
         const el = document.getElementById(s.id);
         const valEl = document.getElementById(s.valId);
         el.addEventListener('input', async () => {
-            const value = parseFloat(el.value);
-            valEl.textContent = value;
+            const value = Number.parseFloat(el.value);
+            valEl.textContent = el.value;
             await window.settingsAPI.updateSettings({[s.key]: value});
         });
     }
@@ -44,7 +44,7 @@ const init = async () => {
     for (const s of selects) {
         const el = document.getElementById(s.id);
         el.addEventListener('change', async () => {
-            const value = s.isInt ? parseInt(el.value, 10) : el.value;
+            const value = s.isInt ? Number.parseInt(el.value, 10) : el.value;
             await window.settingsAPI.updateSettings({[s.key]: value});
         });
     }

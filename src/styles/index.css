@@ -24,10 +24,10 @@
     app-region: no-drag;
     cursor: pointer;
     border: none;
+    outline: none;
     padding: 0;
     width: 30px;
     height: 30px;
-    font-family: sans-serif;
     transition: all 0.2s;
     z-index: 100;
     opacity: 0;
@@ -40,6 +40,30 @@
 .startIcon {
     background: url('../assets/start.png') no-repeat center;
 }
+
 .pauseIcon {
     background: url('../assets/pause.png') no-repeat center;
+}
+
+#error-overlay {
+    app-region: no-drag;
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(180, 40, 40, 0.85);
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 300;
+}
+
+#error-overlay.visible {
+    opacity: 1;
 }
