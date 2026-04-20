@@ -1,7 +1,9 @@
+import {TUNING} from '../constants.js';
+
 export const renderSpectrum = (dataArray, ctx, s, w, h, config) => {
     const isMonochrome = config.colorScheme === 'monochrome';
 
-    const barCount = 64;
+    const barCount = config.spectrumBars || TUNING.spectrumBars;
     const bars = groupBinsLog(dataArray, barCount);
 
     const barWidth = w / barCount;

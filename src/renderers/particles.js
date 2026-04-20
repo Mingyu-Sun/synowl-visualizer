@@ -1,14 +1,16 @@
+import {TUNING} from '../constants.js';
+
 const pool = [];
-const MAX_PARTICLES = 300;
 
 export const renderParticles = (dataArray, ctx, s, w, h, config) => {
     const centerX = w / 2;
     const centerY = h / 2;
     const isMonochrome = config.colorScheme === 'monochrome';
+    const maxParticles = config.particlesMax || TUNING.particlesMax;
 
     // --- Spawn new particles ---
     const spawnCount = Math.floor(s.energy * 8 + s.onset * 10);
-    for (let i = 0; i < spawnCount && pool.length < MAX_PARTICLES; i++) {
+    for (let i = 0; i < spawnCount && pool.length < maxParticles; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 1 + Math.random() * 3 + s.onset * 4;
         const hue = isMonochrome
@@ -27,6 +29,9 @@ export const renderParticles = (dataArray, ctx, s, w, h, config) => {
             saturation: isMonochrome ? 20 : 70 + Math.random() * 20,
         });
     }
+
+    // Drop overflow
+    while (pool.length > maxParticles) pool.shift();
 
     // --- Update and render ---
     for (let i = pool.length - 1; i >= 0; i--) {
