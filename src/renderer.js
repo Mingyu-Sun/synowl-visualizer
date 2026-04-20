@@ -1,6 +1,6 @@
 import {extractFeatures} from './extractor.js';
-import {visualize} from "./visualizer.js";
-import {defaultConfig, initialState, smoothFeatures} from "./states.js";
+import {visualize} from './visualizer.js';
+import {defaultConfig, initialState, smoothFeatures} from './states.js';
 import {VISUALIZATION_MODES, COLOR_SCHEMES} from './constants.js';
 
 const state = {...initialState};
@@ -15,6 +15,7 @@ let stream = null;
 let audioContext = null;
 let analyser = null;
 let source = null;
+let idleFrame = 0;
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -28,6 +29,9 @@ const applySettings = (settings) => {
         colorScheme: settings.colorScheme,
         baseHue: settings.baseHue,
         visualizationMode: settings.visualizationMode,
+        particlesMax: settings.particlesMax,
+        spectrumBars: settings.spectrumBars,
+        radialInnerRatio: settings.radialInnerRatio,
     };
 
     if (analyser) {
@@ -36,6 +40,7 @@ const applySettings = (settings) => {
             analyser.fftSize = fftSize;
             frequencyData = new Uint8Array(analyser.frequencyBinCount);
             timeDomainData = new Uint8Array(analyser.frequencyBinCount);
+            timeDomainData.fill(128);
         }
         analyser.minDecibels = settings.minDecibels;
         analyser.maxDecibels = settings.maxDecibels;
@@ -44,6 +49,7 @@ const applySettings = (settings) => {
         fftSize = settings.fftSize;
         frequencyData = new Uint8Array(fftSize / 2);
         timeDomainData = new Uint8Array(fftSize / 2);
+        timeDomainData.fill(128);
     }
 
     if (canvas.width !== settings.windowSize) {
@@ -66,10 +72,11 @@ const loop = () => {
         analyser.getByteFrequencyData(frequencyData);
         analyser.getByteTimeDomainData(timeDomainData);
     } else {
-        for (let i = 0; i < frequencyData.length; i++) {
-            frequencyData[i] *= 0.9;
+       if ((idleFrame++ & 7) === 0) {
+            for (let i = 0; i < frequencyData.length; i++) {
+                frequencyData[i] = (frequencyData[i] * 0.9) | 0;
+            }
         }
-        timeDomainData.fill(128);
     }
 
     const features = isCapturing
@@ -90,7 +97,20 @@ const showError = (message) => {
 };
 
 const toggleCapture = async (btn) => {
-    if (!isCapturing) {
+    if (isCapturing) {
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        if (audioContext) {
+            try { await audioContext.close(); } catch { /* ignore */ }
+        }
+
+        btn.classList.toggle('startIcon');
+        btn.classList.toggle('pauseIcon');
+        isCapturing = false;
+
+        analyser = null;
+        audioContext = null;
+        source = null;
+    } else {
         try {
             stream = await navigator.mediaDevices.getDisplayMedia({audio: true, video: true});
             audioContext = new AudioContext();
@@ -107,6 +127,7 @@ const toggleCapture = async (btn) => {
 
             frequencyData = new Uint8Array(analyser.frequencyBinCount);
             timeDomainData = new Uint8Array(analyser.frequencyBinCount);
+            timeDomainData.fill(128);
 
             btn.classList.toggle('startIcon');
             btn.classList.toggle('pauseIcon');
@@ -118,25 +139,14 @@ const toggleCapture = async (btn) => {
 
         } catch (err) {
             console.error('Capture error:', err);
-            if (err.name === 'NotAllowedError') {
-                showError('Permission denied');
-            } else if (err.name === 'NotFoundError') {
-                showError('No audio source found');
+            if (err && err.name === 'NotAllowedError') {
+                showError(err.message || 'Permission denied');
+            } else if (err && err.name === 'NotFoundError') {
+                showError(err.message || 'No audio source found');
             } else {
                 showError('Capture failed');
             }
         }
-    } else {
-        if (stream) stream.getTracks().forEach(track => track.stop());
-        if (audioContext) await audioContext.close();
-
-        btn.classList.toggle('startIcon');
-        btn.classList.toggle('pauseIcon');
-        isCapturing = false;
-
-        analyser = null;
-        audioContext = null;
-        source = null;
     }
 };
 

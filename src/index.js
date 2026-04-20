@@ -2,8 +2,6 @@ const {app, ipcMain, BrowserWindow, Menu, Tray, desktopCapturer, session, screen
 const path = require('node:path');
 const {getSettings, updateSettings, resetSettings, setWindowPosition} = require('./settings.js');
 
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-
 if (require('electron-squirrel-startup')) {
     app.quit();
 }
@@ -77,11 +75,11 @@ const createWindow = () => {
         if (settingsWindow && !settingsWindow.isDestroyed()) {
             settingsWindow.webContents.send('settings-changed', updated);
         }
-        if (partial.windowSize !== undefined) {
+        if (partial && partial.windowSize !== undefined) {
             const s = Math.max(300, Math.min(800, Math.round(partial.windowSize)));
             mainWindow.setSize(s, s);
         }
-        if (partial.windowOpacity !== undefined) {
+        if (partial && partial.windowOpacity !== undefined) {
             mainWindow.setOpacity(Math.max(0.2, Math.min(1.0, partial.windowOpacity)));
         }
         return updated;

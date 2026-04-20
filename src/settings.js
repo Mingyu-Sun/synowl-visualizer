@@ -1,29 +1,18 @@
 const {app} = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
+const {defaults, validate} = require('./settings-schema.js');
 
 const SETTINGS_FILE = path.join(app.getPath('userData'), 'settings.json');
-
-const defaults = {
-    fftSize: 2048,
-    minDecibels: -85,
-    maxDecibels: -25,
-    smoothingTimeConstant: 0.8,
-    colorScheme: 'dynamic',
-    baseHue: 200,
-    visualizationMode: 'radial',
-    windowOpacity: 1.0,
-    windowSize: 300,
-    energySmoothing: 0.12,
-    bassSmoothing: 0.2,
-    windowX: undefined,
-    windowY: undefined,
-};
 
 const load = () => {
     try {
         const data = fs.readFileSync(SETTINGS_FILE, 'utf-8');
-        return {...defaults, ...JSON.parse(data)};
+        const parsed = JSON.parse(data);
+        const validated = validate(parsed);
+        if (typeof parsed.windowX === 'number') validated.windowX = parsed.windowX;
+        if (typeof parsed.windowY === 'number') validated.windowY = parsed.windowY;
+        return {...defaults, ...validated};
     } catch {
         return {...defaults};
     }
@@ -38,7 +27,8 @@ let current = load();
 const getSettings = () => ({...current});
 
 const updateSettings = (partial) => {
-    current = {...current, ...partial};
+    const validated = validate(partial);
+    current = {...current, ...validated};
     save(current);
     return {...current};
 };
