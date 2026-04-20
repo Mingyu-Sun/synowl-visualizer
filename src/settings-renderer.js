@@ -28,7 +28,7 @@ const populate = (settings) => {
 };
 
 const init = async () => {
-    const settings = await window.settingsAPI.getSettings();
+    const settings = await globalThis.settingsAPI.getSettings();
     populate(settings);
 
     for (const s of sliders) {
@@ -37,7 +37,7 @@ const init = async () => {
         el.addEventListener("input", async () => {
             const value = Number.parseFloat(el.value);
             valEl.textContent = el.value;
-            await window.settingsAPI.updateSettings({[s.key]: value});
+            await globalThis.settingsAPI.updateSettings({[s.key]: value});
         });
     }
 
@@ -45,16 +45,16 @@ const init = async () => {
         const el = document.getElementById(s.id);
         el.addEventListener("change", async () => {
             const value = s.isInt ? Number.parseInt(el.value, 10) : el.value;
-            await window.settingsAPI.updateSettings({[s.key]: value});
+            await globalThis.settingsAPI.updateSettings({[s.key]: value});
         });
     }
 
     document.getElementById("reset-btn").addEventListener("click", async () => {
-        const updated = await window.settingsAPI.resetSettings();
+        const updated = await globalThis.settingsAPI.resetSettings();
         populate(updated);
     });
 
-    window.settingsAPI.onSettingsChanged((settings) => {
+    globalThis.settingsAPI.onSettingsChanged((settings) => {
         populate(settings);
     });
 };

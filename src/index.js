@@ -75,12 +75,12 @@ const createWindow = () => {
         if (settingsWindow && !settingsWindow.isDestroyed()) {
             settingsWindow.webContents.send("settings-changed", updated);
         }
-        if (partial && partial.windowSize !== undefined) {
+        if (partial?.windowSize !== undefined) {
             const s = Math.max(300, Math.min(800, Math.round(partial.windowSize)));
             mainWindow.setSize(s, s);
         }
-        if (partial && partial.windowOpacity !== undefined) {
-            mainWindow.setOpacity(Math.max(0.2, Math.min(1.0, partial.windowOpacity)));
+        if (partial?.windowOpacity !== undefined) {
+            mainWindow.setOpacity(Math.max(0.2, Math.min(1, partial.windowOpacity)));
         }
         return updated;
     });

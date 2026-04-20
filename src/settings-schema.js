@@ -9,7 +9,7 @@ const defaults = {
     colorScheme: "dynamic",
     baseHue: 200,
     visualizationMode: "radial",
-    windowOpacity: 1.0,
+    windowOpacity: 1,
     windowSize: 300,
     energySmoothing: 0.12,
     bassSmoothing: 0.2,
@@ -23,7 +23,7 @@ const defaults = {
 const clamp = (k, v) => {
     switch (k) {
     case "windowSize": return Math.max(300, Math.min(800, v));
-    case "windowOpacity": return Math.max(0.2, Math.min(1.0, v));
+    case "windowOpacity": return Math.max(0.2, Math.min(1, v));
     case "smoothingTimeConstant": return Math.max(0, Math.min(0.99, v));
     case "minDecibels": return Math.max(-100, Math.min(-30, v));
     case "maxDecibels": return Math.max(-60, Math.min(0, v));
@@ -45,7 +45,7 @@ const SCHEMA = {
     colorScheme: (v) => COLOR_SCHEMES.includes(v),
     baseHue: (v) => typeof v === "number" && v >= 0 && v < 360,
     visualizationMode: (v) => VISUALIZATION_MODES.includes(v),
-    windowOpacity: (v) => typeof v === "number" && v >= 0.2 && v <= 1.0,
+    windowOpacity: (v) => typeof v === "number" && v >= 0.2 && v <= 1,
     windowSize: (v) => typeof v === "number" && v >= 300 && v <= 800,
     energySmoothing: (v) => typeof v === "number" && v >= 0.01 && v <= 0.5,
     bassSmoothing: (v) => typeof v === "number" && v >= 0.01 && v <= 0.5,
@@ -60,7 +60,7 @@ const validate = (partial) => {
     const clean = {};
     if (!partial || typeof partial !== "object") return clean;
     for (const [k, v] of Object.entries(partial)) {
-        if (SCHEMA[k] && SCHEMA[k](v)) {
+        if (SCHEMA[k]?.(v)) {
             clean[k] = clamp(k, v);
         }
     }

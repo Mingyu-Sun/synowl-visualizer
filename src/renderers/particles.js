@@ -22,7 +22,7 @@ export const renderParticles = (dataArray, ctx, s, w, h, config) => {
             y: centerY,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
-            life: 1.0,
+            life: 1,
             decay: 0.008 + Math.random() * 0.005,
             size: 2 + Math.random() * 3 + s.onset * 2,
             hue,

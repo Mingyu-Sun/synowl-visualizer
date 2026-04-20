@@ -32,7 +32,7 @@ const pushHistory = (state, e) => {
 const historyMean = (state) => {
     const h = state.energyHistory;
     let s = 0;
-    for (let i = 0; i < h.length; i++) s += h[i];
+    for (const e of h) s += e;
     return s / h.length;
 };
 
@@ -73,7 +73,7 @@ export const smoothFeatures = (state, raw, isCapturing, config = defaultConfig) 
         if (onset) {
             state.beatDensity = Math.min(
                 state.beatDensity + TUNING.beatDensityImpulse,
-                1.0
+                1
             );
         } else {
             state.beatDensity *= TUNING.beatDensityDecay;
@@ -97,7 +97,7 @@ export const smoothFeatures = (state, raw, isCapturing, config = defaultConfig) 
             : TUNING.hueLerp;
         state.hue += (targetHue - state.hue) * lerp;
 
-        if (onset) state.onset = 1.0;
+        if (onset) state.onset = 1;
         else state.onset *= TUNING.onsetDecay;
 
         state.lastEnergy = raw.energy;

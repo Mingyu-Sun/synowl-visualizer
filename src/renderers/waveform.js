@@ -4,7 +4,7 @@ export const renderWaveform = (dataArray, ctx, s, w, h, config, timeDomainData) 
 
     const isMonochrome = config.colorScheme === "monochrome";
     const baseRadius = (h * 0.15) + (s.energy * 60);
-    const maxAmplitude = h * 0.10; // Reduced from 0.25 — less exaggerated
+    const maxAmplitude = h * 0.1;
 
     const data = timeDomainData || dataArray;
     const len = data.length;
@@ -14,7 +14,7 @@ export const renderWaveform = (dataArray, ctx, s, w, h, config, timeDomainData) 
     for (let i = 0; i <= len; i++) {
         const idx = i % len;
         const norm = (data[idx] - 128) / 128;
-        const r = baseRadius + norm * maxAmplitude * (1 + s.onset * 0.2); // onset multiplier reduced from 0.5
+        const r = baseRadius + norm * maxAmplitude * (1 + s.onset * 0.2);
 
         const angle = (idx / len) * Math.PI * 2 - Math.PI / 2;
         const x = centerX + Math.cos(angle) * r;
@@ -35,7 +35,7 @@ export const renderWaveform = (dataArray, ctx, s, w, h, config, timeDomainData) 
     ctx.stroke();
 
     // --- Glow layer ---
-    ctx.strokeStyle = `hsla(${hue}, ${saturation}%, 60%, ${0.1 + s.energy * 0.15})`; // Reduced from 0.15/0.2
+    ctx.strokeStyle = `hsla(${hue}, ${saturation}%, 60%, ${0.1 + s.energy * 0.15})`;
     ctx.lineWidth = 5 + s.onset * 5;
     ctx.stroke();
 };
