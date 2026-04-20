@@ -1,11 +1,11 @@
-import {TUNING} from '../constants.js';
+import {TUNING} from "../constants.js";
 
 const pool = [];
 
 export const renderParticles = (dataArray, ctx, s, w, h, config) => {
     const centerX = w / 2;
     const centerY = h / 2;
-    const isMonochrome = config.colorScheme === 'monochrome';
+    const isMonochrome = config.colorScheme === "monochrome";
     const maxParticles = config.particlesMax || TUNING.particlesMax;
 
     // --- Spawn new particles ---

@@ -1,17 +1,17 @@
 const sliders = [
-    {id: 'set-minDecibels', key: 'minDecibels', valId: 'val-minDecibels'},
-    {id: 'set-maxDecibels', key: 'maxDecibels', valId: 'val-maxDecibels'},
-    {id: 'set-smoothingTimeConstant', key: 'smoothingTimeConstant', valId: 'val-smoothingTimeConstant'},
-    {id: 'set-energySmoothing', key: 'energySmoothing', valId: 'val-energySmoothing'},
-    {id: 'set-bassSmoothing', key: 'bassSmoothing', valId: 'val-bassSmoothing'},
-    {id: 'set-windowSize', key: 'windowSize', valId: 'val-windowSize'},
-    {id: 'set-windowOpacity', key: 'windowOpacity', valId: 'val-windowOpacity'},
+    {id: "set-minDecibels", key: "minDecibels", valId: "val-minDecibels"},
+    {id: "set-maxDecibels", key: "maxDecibels", valId: "val-maxDecibels"},
+    {id: "set-smoothingTimeConstant", key: "smoothingTimeConstant", valId: "val-smoothingTimeConstant"},
+    {id: "set-energySmoothing", key: "energySmoothing", valId: "val-energySmoothing"},
+    {id: "set-bassSmoothing", key: "bassSmoothing", valId: "val-bassSmoothing"},
+    {id: "set-windowSize", key: "windowSize", valId: "val-windowSize"},
+    {id: "set-windowOpacity", key: "windowOpacity", valId: "val-windowOpacity"},
 ];
 
 const selects = [
-    {id: 'set-visualizationMode', key: 'visualizationMode', isInt: false},
-    {id: 'set-fftSize', key: 'fftSize', isInt: true},
-    {id: 'set-colorScheme', key: 'colorScheme', isInt: false},
+    {id: "set-visualizationMode", key: "visualizationMode", isInt: false},
+    {id: "set-fftSize", key: "fftSize", isInt: true},
+    {id: "set-colorScheme", key: "colorScheme", isInt: false},
 ];
 
 const populate = (settings) => {
@@ -34,7 +34,7 @@ const init = async () => {
     for (const s of sliders) {
         const el = document.getElementById(s.id);
         const valEl = document.getElementById(s.valId);
-        el.addEventListener('input', async () => {
+        el.addEventListener("input", async () => {
             const value = Number.parseFloat(el.value);
             valEl.textContent = el.value;
             await window.settingsAPI.updateSettings({[s.key]: value});
@@ -43,13 +43,13 @@ const init = async () => {
 
     for (const s of selects) {
         const el = document.getElementById(s.id);
-        el.addEventListener('change', async () => {
+        el.addEventListener("change", async () => {
             const value = s.isInt ? Number.parseInt(el.value, 10) : el.value;
             await window.settingsAPI.updateSettings({[s.key]: value});
         });
     }
 
-    document.getElementById('reset-btn').addEventListener('click', async () => {
+    document.getElementById("reset-btn").addEventListener("click", async () => {
         const updated = await window.settingsAPI.resetSettings();
         populate(updated);
     });

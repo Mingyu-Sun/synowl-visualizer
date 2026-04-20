@@ -1,5 +1,5 @@
-export const VISUALIZATION_MODES = ['radial', 'waveform', 'spectrum', 'particles'];
-export const COLOR_SCHEMES = ['dynamic', 'cool', 'warm', 'monochrome'];
+export const VISUALIZATION_MODES = ["radial", "waveform", "spectrum", "particles"];
+export const COLOR_SCHEMES = ["dynamic", "cool", "warm", "monochrome"];
 
 export const TUNING = {
     // Feature extraction

@@ -1,4 +1,4 @@
-import {TUNING} from './constants.js';
+import {TUNING} from "./constants.js";
 
 export const initialState = {
     energy: 0.05,
@@ -18,9 +18,9 @@ export const initialState = {
 export const defaultConfig = {
     energySmoothing: 0.12,
     bassSmoothing: 0.2,
-    colorScheme: 'dynamic',
+    colorScheme: "dynamic",
     baseHue: 200,
-    visualizationMode: 'radial',
+    visualizationMode: "radial",
 };
 
 const pushHistory = (state, e) => {
@@ -92,7 +92,7 @@ export const smoothFeatures = (state, raw, isCapturing, config = defaultConfig) 
 
         // Color scheme
         const targetHue = getTargetHue(config.colorScheme, state.warmth, config.baseHue);
-        const lerp = config.colorScheme === 'monochrome'
+        const lerp = config.colorScheme === "monochrome"
             ? TUNING.baseHueLerp
             : TUNING.hueLerp;
         state.hue += (targetHue - state.hue) * lerp;

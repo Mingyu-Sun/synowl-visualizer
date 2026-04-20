@@ -1,7 +1,7 @@
-import {extractFeatures} from './extractor.js';
-import {visualize} from './visualizer.js';
-import {defaultConfig, initialState, smoothFeatures} from './states.js';
-import {VISUALIZATION_MODES, COLOR_SCHEMES} from './constants.js';
+import {extractFeatures} from "./extractor.js";
+import {visualize} from "./visualizer.js";
+import {defaultConfig, initialState, smoothFeatures} from "./states.js";
+import {VISUALIZATION_MODES, COLOR_SCHEMES} from "./constants.js";
 
 const state = {...initialState};
 let config = {...defaultConfig};
@@ -17,9 +17,9 @@ let analyser = null;
 let source = null;
 let idleFrame = 0;
 
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const errorOverlay = document.getElementById('error-overlay');
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const errorOverlay = document.getElementById("error-overlay");
 
 // --- Settings ---
 const applySettings = (settings) => {
@@ -72,7 +72,7 @@ const loop = () => {
         analyser.getByteFrequencyData(frequencyData);
         analyser.getByteTimeDomainData(timeDomainData);
     } else {
-       if ((idleFrame++ & 7) === 0) {
+        if ((idleFrame++ & 7) === 0) {
             for (let i = 0; i < frequencyData.length; i++) {
                 frequencyData[i] = (frequencyData[i] * 0.9) | 0;
             }
@@ -91,9 +91,9 @@ const loop = () => {
 let errorTimer = null;
 const showError = (message) => {
     errorOverlay.textContent = message;
-    errorOverlay.classList.add('visible');
+    errorOverlay.classList.add("visible");
     clearTimeout(errorTimer);
-    errorTimer = setTimeout(() => errorOverlay.classList.remove('visible'), 3000);
+    errorTimer = setTimeout(() => errorOverlay.classList.remove("visible"), 3000);
 };
 
 const toggleCapture = async (btn) => {
@@ -103,8 +103,8 @@ const toggleCapture = async (btn) => {
             try { await audioContext.close(); } catch { /* ignore */ }
         }
 
-        btn.classList.toggle('startIcon');
-        btn.classList.toggle('pauseIcon');
+        btn.classList.toggle("startIcon");
+        btn.classList.toggle("pauseIcon");
         isCapturing = false;
 
         analyser = null;
@@ -129,8 +129,8 @@ const toggleCapture = async (btn) => {
             timeDomainData = new Uint8Array(analyser.frequencyBinCount);
             timeDomainData.fill(128);
 
-            btn.classList.toggle('startIcon');
-            btn.classList.toggle('pauseIcon');
+            btn.classList.toggle("startIcon");
+            btn.classList.toggle("pauseIcon");
             isCapturing = true;
 
             stream.getTracks()[0].onended = () => {
@@ -138,13 +138,13 @@ const toggleCapture = async (btn) => {
             };
 
         } catch (err) {
-            console.error('Capture error:', err);
-            if (err && err.name === 'NotAllowedError') {
-                showError(err.message || 'Permission denied');
-            } else if (err && err.name === 'NotFoundError') {
-                showError(err.message || 'No audio source found');
+            console.error("Capture error:", err);
+            if (err && err.name === "NotAllowedError") {
+                showError(err.message || "Permission denied");
+            } else if (err && err.name === "NotFoundError") {
+                showError(err.message || "No audio source found");
             } else {
-                showError('Capture failed');
+                showError("Capture failed");
             }
         }
     }
@@ -154,53 +154,53 @@ window.electronAPI.onToggleCapture(() => {
     toggleCapture(toggleBtn);
 });
 
-window.addEventListener('contextmenu', (e) => {
+window.addEventListener("contextmenu", (e) => {
     e.preventDefault();
     window.electronAPI.showContextMenu();
 });
 
-const toggleBtn = document.getElementById('toggleBtn');
-toggleBtn.addEventListener('click', () => toggleCapture(toggleBtn));
+const toggleBtn = document.getElementById("toggleBtn");
+toggleBtn.addEventListener("click", () => toggleCapture(toggleBtn));
 
-window.addEventListener('keydown', async (e) => {
+window.addEventListener("keydown", async (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
 
     switch (e.code) {
-        case 'Space':
-            e.preventDefault();
-            await toggleCapture(toggleBtn);
-            break;
+    case "Space":
+        e.preventDefault();
+        await toggleCapture(toggleBtn);
+        break;
 
-        case 'KeyS':
-        case 'Escape':
-            window.electronAPI.openSettings();
-            break;
+    case "KeyS":
+    case "Escape":
+        window.electronAPI.openSettings();
+        break;
 
-        case 'KeyM': {
-            const cur = VISUALIZATION_MODES.indexOf(config.visualizationMode);
-            const next = VISUALIZATION_MODES[(cur + 1) % VISUALIZATION_MODES.length];
-            await window.electronAPI.updateSettings({visualizationMode: next});
-            break;
-        }
+    case "KeyM": {
+        const cur = VISUALIZATION_MODES.indexOf(config.visualizationMode);
+        const next = VISUALIZATION_MODES[(cur + 1) % VISUALIZATION_MODES.length];
+        await window.electronAPI.updateSettings({visualizationMode: next});
+        break;
+    }
 
-        case 'KeyC': {
-            const cur = COLOR_SCHEMES.indexOf(config.colorScheme);
-            const next = COLOR_SCHEMES[(cur + 1) % COLOR_SCHEMES.length];
-            await window.electronAPI.updateSettings({colorScheme: next});
-            break;
-        }
+    case "KeyC": {
+        const cur = COLOR_SCHEMES.indexOf(config.colorScheme);
+        const next = COLOR_SCHEMES[(cur + 1) % COLOR_SCHEMES.length];
+        await window.electronAPI.updateSettings({colorScheme: next});
+        break;
+    }
 
-        case 'Digit1':
-            await window.electronAPI.updateSettings({visualizationMode: 'radial'});
-            break;
-        case 'Digit2':
-            await window.electronAPI.updateSettings({visualizationMode: 'waveform'});
-            break;
-        case 'Digit3':
-            await window.electronAPI.updateSettings({visualizationMode: 'spectrum'});
-            break;
-        case 'Digit4':
-            await window.electronAPI.updateSettings({visualizationMode: 'particles'});
-            break;
+    case "Digit1":
+        await window.electronAPI.updateSettings({visualizationMode: "radial"});
+        break;
+    case "Digit2":
+        await window.electronAPI.updateSettings({visualizationMode: "waveform"});
+        break;
+    case "Digit3":
+        await window.electronAPI.updateSettings({visualizationMode: "spectrum"});
+        break;
+    case "Digit4":
+        await window.electronAPI.updateSettings({visualizationMode: "particles"});
+        break;
     }
 });

@@ -1,4 +1,4 @@
-import {TUNING} from '../constants.js';
+import {TUNING} from "../constants.js";
 
 // Precompute trig tables
 let cachedNumBars = 0;
@@ -28,7 +28,7 @@ export const renderRadial = (dataArray, ctx, s, w, h, config) => {
     const angleStep = (Math.PI * 2) / numBars;
     precomputeTrigTable(numBars);
 
-    const isMonochrome = config.colorScheme === 'monochrome';
+    const isMonochrome = config.colorScheme === "monochrome";
     const saturation = isMonochrome ? 20 : 80;
     const barWidth = (innerRadius * angleStep) * 0.8;
 

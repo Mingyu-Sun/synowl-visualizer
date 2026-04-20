@@ -2,7 +2,7 @@ export const renderWaveform = (dataArray, ctx, s, w, h, config, timeDomainData) 
     const centerX = w / 2;
     const centerY = h / 2;
 
-    const isMonochrome = config.colorScheme === 'monochrome';
+    const isMonochrome = config.colorScheme === "monochrome";
     const baseRadius = (h * 0.15) + (s.energy * 60);
     const maxAmplitude = h * 0.10; // Reduced from 0.25 — less exaggerated
 

@@ -1,4 +1,4 @@
-import {TUNING} from './constants.js';
+import {TUNING} from "./constants.js";
 
 export const extractFeatures = (dataArray, sampleRate, fftSize, lastEnergy) => {
     let totalNorm = 0;

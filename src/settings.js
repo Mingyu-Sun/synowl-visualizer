@@ -1,17 +1,17 @@
-const {app} = require('electron');
-const fs = require('node:fs');
-const path = require('node:path');
-const {defaults, validate} = require('./settings-schema.js');
+const {app} = require("electron");
+const fs = require("node:fs");
+const path = require("node:path");
+const {defaults, validate} = require("./settings-schema.js");
 
-const SETTINGS_FILE = path.join(app.getPath('userData'), 'settings.json');
+const SETTINGS_FILE = path.join(app.getPath("userData"), "settings.json");
 
 const load = () => {
     try {
-        const data = fs.readFileSync(SETTINGS_FILE, 'utf-8');
+        const data = fs.readFileSync(SETTINGS_FILE, "utf-8");
         const parsed = JSON.parse(data);
         const validated = validate(parsed);
-        if (typeof parsed.windowX === 'number') validated.windowX = parsed.windowX;
-        if (typeof parsed.windowY === 'number') validated.windowY = parsed.windowY;
+        if (typeof parsed.windowX === "number") validated.windowX = parsed.windowX;
+        if (typeof parsed.windowY === "number") validated.windowY = parsed.windowY;
         return {...defaults, ...validated};
     } catch {
         return {...defaults};
