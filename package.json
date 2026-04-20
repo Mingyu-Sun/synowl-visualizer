@@ -34,7 +34,7 @@
     "@electron/fuses": "^1.8.0",
     "@eslint/css": "^1.0.0",
     "@eslint/js": "^10.0.1",
-    "electron": "41.0.2",
+    "electron": "^41.2.1",
     "eslint": "^10.0.3",
     "globals": "^17.4.0"
   }

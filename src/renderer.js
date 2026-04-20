@@ -1,9 +1,7 @@
 import {extractFeatures} from './extractor.js';
 import {visualize} from "./visualizer.js";
 import {defaultConfig, initialState, smoothFeatures} from "./states.js";
-
-const VISUALIZATION_MODES = ['radial', 'waveform', 'spectrum', 'particles'];
-const COLOR_SCHEMES = ['dynamic', 'cool', 'warm', 'monochrome'];
+import {VISUALIZATION_MODES, COLOR_SCHEMES} from './constants.js';
 
 const state = {...initialState};
 let config = {...defaultConfig};

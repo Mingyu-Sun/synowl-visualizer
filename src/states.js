@@ -1,3 +1,5 @@
+import {TUNING} from './constants.js';
+
 export const initialState = {
     energy: 0.05,
     bass: 0.02,
@@ -9,6 +11,8 @@ export const initialState = {
     phase: 0,
     warmth: 0, // 0 (Cold) to 1 (Warm)
     beatDensity: 0,
+    energyHistory: new Float32Array(TUNING.energyHistorySize),
+    energyHistoryIdx: 0,
 };
 
 export const defaultConfig = {
@@ -19,6 +23,40 @@ export const defaultConfig = {
     visualizationMode: 'radial',
 };
 
+const pushHistory = (state, e) => {
+    state.energyHistory[state.energyHistoryIdx] = e;
+    state.energyHistoryIdx =
+        (state.energyHistoryIdx + 1) % state.energyHistory.length;
+};
+
+const historyMean = (state) => {
+    const h = state.energyHistory;
+    let s = 0;
+    for (let i = 0; i < h.length; i++) s += h[i];
+    return s / h.length;
+};
+
+const detectOnset = (state, raw) => {
+    const localAvg = historyMean(state);
+    const ratioSpike =
+        localAvg > 0 &&
+        raw.energy > localAvg * TUNING.onsetMultiplier &&
+        (raw.energy - state.lastEnergy) > (TUNING.onsetThreshold * 0.66);
+    return raw.isOnset || ratioSpike;
+};
+
+const palettes = {
+    dynamic:    (warmth) => 200 - 200 * warmth,
+    cool:       (warmth) => 180 + 80 * (1 - warmth),
+    warm:       (warmth) => 60 * warmth,
+    monochrome: (_warmth, base) => base,
+};
+
+const getTargetHue = (schemeName, warmth, baseHue) => {
+    const fn = palettes[schemeName] || palettes.dynamic;
+    return fn(warmth, baseHue);
+};
+
 export const smoothFeatures = (state, raw, isCapturing, config = defaultConfig) => {
     state.phase += 0.01; // Constant time-based counter
 
@@ -26,49 +64,53 @@ export const smoothFeatures = (state, raw, isCapturing, config = defaultConfig) 
         // --- ACTIVE MODE ---
         state.energy += (raw.energy - state.energy) * config.energySmoothing;
         state.bass += (raw.bass - state.bass) * config.bassSmoothing;
-        state.flatness += (raw.flatness - state.flatness) * 0.1;
-        state.centroid += (raw.centroid - state.centroid) * 0.1;
+        state.flatness += (raw.flatness - state.flatness) * TUNING.flatnessSmoothing;
+        state.centroid += (raw.centroid - state.centroid) * TUNING.centroidSmoothing;
 
-        if (raw.isOnset) {
-            state.beatDensity = Math.min(state.beatDensity + 0.8, 1.0);
+        const onset = detectOnset(state, raw);
+        pushHistory(state, raw.energy);
+
+        if (onset) {
+            state.beatDensity = Math.min(
+                state.beatDensity + TUNING.beatDensityImpulse,
+                1.0
+            );
         } else {
-            state.beatDensity *= 0.98;
+            state.beatDensity *= TUNING.beatDensityDecay;
         }
 
-        const energyScore = Math.min(raw.energy / 0.15, 1);
-        const bassScore = Math.min(raw.bass / 0.1, 1);
+        const energyScore = Math.min(raw.energy / TUNING.energyNormalizer, 1);
+        const bassScore = Math.min(raw.bass / TUNING.bassNormalizer, 1);
         const rhythmScore = state.beatDensity;
 
-        const targetWarmth = (energyScore * 0.3 + rhythmScore * 0.5 + bassScore * 0.2);
-        state.warmth += (targetWarmth - state.warmth) * 0.05;
+        const w = TUNING.warmthWeights;
+        const targetWarmth =
+            energyScore * w.energy +
+            rhythmScore * w.rhythm +
+            bassScore * w.bass;
+        state.warmth += (targetWarmth - state.warmth) * TUNING.warmthLerp;
 
         // Color scheme
-        if (config.colorScheme === 'dynamic') {
-            const targetHue = 200 - (200 * state.warmth);
-            state.hue += (targetHue - state.hue) * 0.05;
-        } else if (config.colorScheme === 'cool') {
-            const targetHue = 180 + (80 * (1 - state.warmth)); // 180-260
-            state.hue += (targetHue - state.hue) * 0.05;
-        } else if (config.colorScheme === 'warm') {
-            const targetHue = 60 * state.warmth; // 0-60
-            state.hue += (targetHue - state.hue) * 0.05;
-        } else if (config.colorScheme === 'monochrome') {
-            state.hue += (config.baseHue - state.hue) * 0.1;
-        }
+        const targetHue = getTargetHue(config.colorScheme, state.warmth, config.baseHue);
+        const lerp = config.colorScheme === 'monochrome'
+            ? TUNING.baseHueLerp
+            : TUNING.hueLerp;
+        state.hue += (targetHue - state.hue) * lerp;
 
-        if (raw.isOnset) state.onset = 1.0;
-        else state.onset *= 0.92;
+        if (onset) state.onset = 1.0;
+        else state.onset *= TUNING.onsetDecay;
 
         state.lastEnergy = raw.energy;
     } else {
         // --- STANDBY MODE: Gradual return to calm ---
-        const breathing = 0.08 + Math.sin(state.phase) * 0.05;
+        const breathing =
+            TUNING.idleEnergyBase + Math.sin(state.phase) * TUNING.idleEnergyAmplitude;
 
-        state.energy += (breathing - state.energy) * 0.02;
-        state.bass += (0.02 - state.bass) * 0.02;
-        state.onset *= 0.9;
-        state.beatDensity *= 0.95;
-        state.hue = (state.hue + 0.1) % 360;
-        state.warmth *= 0.95;
+        state.energy += (breathing - state.energy) * TUNING.idleEnergyLerp;
+        state.bass += (TUNING.idleBassTarget - state.bass) * TUNING.idleBassLerp;
+        state.onset *= TUNING.idleOnsetDecay;
+        state.beatDensity *= TUNING.idleBeatDensityDecay;
+        state.hue = (state.hue + TUNING.idleHueDrift) % 360;
+        state.warmth *= TUNING.idleWarmthDecay;
     }
 };
