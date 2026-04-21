@@ -46,7 +46,7 @@ export const renderRadial = (dataArray, ctx, s, w, h, config) => {
         const cx = centerX + cosTable[i] * innerRadius;
         const cy = centerY + sinTable[i] * innerRadius;
         ctx.setTransform(cosTable[i], sinTable[i], -sinTable[i], cosTable[i], cx, cy);
-        ctx.fillRect(barWidth / 2, -barHeight / 2, barWidth, barHeight);
+        ctx.fillRect(-barHeight / 2, -barWidth / 2, barHeight, barWidth);
     }
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
